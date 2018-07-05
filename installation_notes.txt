@@ -1,0 +1,22 @@
+
+## For dash and plotly installation :
+sudo pip install nose --user BytePython --ignore-installed six
+sudo pip2 install nose --ignore-installed six
+sudo pip install nose --user --ignore-installed six
+sudo pip install tornado
+sudo pip install dash==0.21.1  # The core dash backend
+sudo pip install dash-renderer==0.13.0  # The dash front-end
+sudo pip install dash-html-components==0.11.0  # HTML components
+sudo pip install dash-core-components==0.23.0  # Supercharged components
+sudo pip install plotly --upgrade  # Plotly graphing library used in examples
+sudo pip install pandas-datareader --ignore-installed six
+
+# had to rollback to 1.22 to avoid this error : 
+sudo pip install urllib3==1.22
+
+sudo pip install pandas
+
+## Was seeing this error : Importerror: cannot import name 'is_list_like
+## This was fixed in #520 and will be a part of the next release (0.7.0). For now, I had to use the dev version
+sudo pip install git+https://github.com/pydata/pandas-datareader
+
