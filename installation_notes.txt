@@ -20,3 +20,7 @@ sudo pip install pandas
 ## This was fixed in #520 and will be a part of the next release (0.7.0). For now, I had to use the dev version
 sudo pip install git+https://github.com/pydata/pandas-datareader
 
+
+### Useful resources:
+Notes on dash-html-components :
+https://github.com/plotly/dash-html-components
