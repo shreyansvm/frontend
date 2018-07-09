@@ -15,18 +15,25 @@ app.layout = html.Div([
         html.P('Currently our investments range from Tech to Pharma to Energy.')
     ]),
 
-    ### TODO : This functionality not yet working. Handle how user-selected start and end time can be passed to callback method
     html.Div([
         html.P("Start-Time"),
-        dcc.Dropdown(id='start_time', options=[
-                     {'label': i, 'value': i} for i in ['Jan 1st 2016', 'Jan 1st 2017', 'Jan 1st 2018']], value='Jan 1st 2018')
-    ], style={'width': '40%', 'margin-left': '3%', 'display': 'inline-block'}),
+        dcc.Dropdown(id='start_time',
+            options=[
+                {'label': 'Last 6 Months', 'value':'last_6_mnths'},
+                {'label': 'Last 1 Year', 'value': 'last_1_yr'},
+                {'label': 'Last 5 Years', 'value': 'last_5_yrs'}
+            ],
+            value='last_1_yr')
+        ], style={'width': '40%', 'margin-left': '3%', 'display': 'inline-block'}),
 
+    ### TODO : Get more options for end-date
     html.Div([
         html.P("End-Time"),
         dcc.Dropdown(id='end_time', options=[
-                     {'label': i, 'value': i} for i in ['Jan 1st 2016', 'Jan 1st 2017', 'Jan 1st 2018']], value='Jan 1st 2018')
-    ], style={'width': '31%', 'margin-left': '3%', 'display': 'inline-block'}),
+                {'label': 'Today', 'value': 'today'}
+            ],
+            value='today')
+        ], style={'width': '31%', 'margin-left': '3%', 'display': 'inline-block'}),
 
     html.Div([
         html.P("Please select the stock from the drop-down to view its current stock price between the above start and end dates")
@@ -50,10 +57,38 @@ app.layout = html.Div([
     dcc.Graph(id='my-graph')
 ])
 
-@app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
-def update_graph(selected_dropdown_value):
-    start = datetime.datetime(2018, 1, 1)
-    end = datetime.date.today()
+@app.callback(
+    Output(component_id='my-graph', component_property='figure'),
+    [
+        Input(component_id='my-dropdown', component_property='value'),
+        Input(component_id='start_time', component_property='value'),
+        Input(component_id='end_time', component_property='value')
+    ]
+    )
+def update_graph(selected_dropdown_value, start_time, end_time):
+    # print('--- User selected selected_dropdown_value : ', selected_dropdown_value)
+    # print('--- User selected start_time : ', start_time)
+    # print('--- User selected end_time : ', end_time)
+    # TODO : Add a button which will be clicked only when all three options : Stock, start_time and end_time are selected. Graph should be displayed only after this
+    # TODO : Validate start_time and end_time
+    today_date = datetime.date.today()
+    if start_time == 'last_6_mnths':
+        start = today_date - datetime.timedelta(6 * 365 / 12)
+    elif start_time == 'last_1_yr':
+        start = today_date - datetime.timedelta(12 * 365 / 12)
+    elif start_time == 'last_5_yrs':
+        start = today_date - datetime.timedelta(12 * 5 * 365 / 12)
+    else:
+        start = today_date - datetime.timedelta(12*365/12)
+
+    if end_time == 'today':
+        end = datetime.date.today()
+    else:
+        end = datetime.date.today()
+
+    # start = datetime.datetime(2018, 1, 1)
+    print('start : ', start)
+    print('end : ', end)
     df = pdr.get_data_yahoo(selected_dropdown_value, start, end)
     return {
         'data': [{
