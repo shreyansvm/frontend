@@ -5,6 +5,8 @@ import dash_html_components as html
 # from pandas_datareader import data as web
 import pandas_datareader as pdr
 import datetime
+import crunchbase as crunchbase
+import newsapi as newsapi
 
 app = dash.Dash()
 
@@ -54,7 +56,16 @@ app.layout = html.Div([
         ],
         value='NVDA'
     ),
-    dcc.Graph(id='my-graph')
+    dcc.Graph(id='my-graph'),
+
+    # html.Div([
+    #     html.P('Latest NEWS about ~~~~~')
+    #     # html.P(news.)
+    #     # html.P('Latest NEWS about ~~~~~'),
+    #     # html.P(newsapi.print_newsapi())
+    # ])
+
+    html.Div(id='update_news')
 ])
 
 @app.callback(
@@ -90,6 +101,7 @@ def update_graph(selected_dropdown_value, start_time, end_time):
     print('start : ', start)
     print('end : ', end)
     df = pdr.get_data_yahoo(selected_dropdown_value, start, end)
+    #update_news(selected_dropdown_value)
     return {
         'data': [{
             'x': df.index,
@@ -97,5 +109,42 @@ def update_graph(selected_dropdown_value, start_time, end_time):
         }]
     }
 
+"""
+Another callback for displaying latest news for each selection
+Refer : 'Multiple Outputs' section at https://dash.plot.ly/getting-started-part-2
+"""
+@app.callback(
+    dash.dependencies.Output('update_news', 'children'),
+    [dash.dependencies.Input('my-dropdown', 'value')]
+    )
+def update_news(selected_dropdown_value):
+    return 'You\'ve selected "{}"'.format(selected_dropdown_value)
+
+def update_news(company):
+    news = newsapi.newsApi()
+    news.print_user_text(company)
+    app = dash.Dash()
+
+    app.layout = html.Div([
+        html.H2('Portfolio News', className='banner'),
+        html.Div([
+            html.P('Latest NEWS about ~~~~~'),
+            html.P(company)
+            # html.P('Latest NEWS about ~~~~~'),
+            # html.P(newsapi.print_newsapi())
+        ])
+    ])
+
+# TODO : Create separate methods to calculate start_time and end_time
+
 if __name__ == '__main__':
+    crunchbase.print_crunchbase()
+    # newsapi.print_newsapi()
     app.run_server(host='127.0.0.1', port=8888)
+
+
+"""
+Python Dash documentation :
+    https://dash.plot.ly/getting-started
+    
+"""
