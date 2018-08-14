@@ -118,28 +118,25 @@ Refer : 'Multiple Outputs' section at https://dash.plot.ly/getting-started-part-
     [dash.dependencies.Input('my-dropdown', 'value')]
     )
 def update_news(selected_dropdown_value):
-    return 'You\'ve selected "{}"'.format(selected_dropdown_value)
+    # TODO : display News on selected company
+    # TODO : display Crunchbase updates for the selected company
+    company = '{} company'.format(selected_dropdown_value)
+    news = newsapi.newsApi('everything', company)
+    all_news = news.get_response()
+    formated_news = '-------- Checkout the latest news on {} --------  \n'.format(selected_dropdown_value)
+    if all_news["status"] == "ok":
+        for each_article in all_news["articles"]:
+            formated_news += each_article['description'] + "\n\tFor more details visit : " + each_article['url'] + "\n\n"
 
-def update_news(company):
-    news = newsapi.newsApi()
-    news.print_user_text(company)
-    app = dash.Dash()
+    # print(formated_news)
+    return formated_news
+    # return '-------- Checkout the latest news on {} --------  \n'.format(selected_dropdown_value) + all_news['articles'][0]['description'] + '\n\t' + all_news['articles'][0]['url'] + '\n'
 
-    app.layout = html.Div([
-        html.H2('Portfolio News', className='banner'),
-        html.Div([
-            html.P('Latest NEWS about ~~~~~'),
-            html.P(company)
-            # html.P('Latest NEWS about ~~~~~'),
-            # html.P(newsapi.print_newsapi())
-        ])
-    ])
 
 # TODO : Create separate methods to calculate start_time and end_time
 
 if __name__ == '__main__':
     crunchbase.print_crunchbase()
-    # newsapi.print_newsapi()
     app.run_server(host='127.0.0.1', port=8888)
 
 
