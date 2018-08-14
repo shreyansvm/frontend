@@ -1,1 +1,1 @@
-# frontend
+# Creating my personal Stocks tracker
