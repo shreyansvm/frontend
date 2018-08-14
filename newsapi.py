@@ -4,18 +4,16 @@ API_KEY = "XXXXXXXXXXX"
 
 class newsApi(object):
 
-    def __init__(self):
+    def __init__(self,
+                 news_type = "top-headlines",
+                 keyword = None,
+                 domains = None,
+                 **kwargs):
         print('------ Hello from NewsApi ------\n')
         self.api_key = API_KEY
         self.base_url = "https://newsapi.org/v2/"
 
-        # news_type can be : top-headlines or everything
-        self.news_type = "top-headlines"
-        self.keyword = None
-        self.query_type = ""
-        if self.news_type is "everything" and self.keyword is not None:
-            self.query_type = "q=" + self.keyword + "&"
-
+        self.language = "en"
         self.country = "us"
         self.api = "apiKey=" + self.api_key
 
@@ -26,15 +24,40 @@ class newsApi(object):
         if self.news_source is not None:
             self.source = "sources=" + self.news_source + "&"
 
+        self.domains = domains
+
         # dict of {'news_source': 'category'}
         # Example : {'abc-news': 'general', 'bbc-sport': 'sports'}
         self.available_news_categories = self.available_news_categories()
 
-        self.full_url = self.base_url + \
-                        self.news_type + "?" + \
-                        self.source + \
-                        "country=" + self.country + "&" + \
-                        self.api
+        # news_type can be : top-headlines or everything
+        self.news_type = news_type
+        self.keyword = keyword
+        self.query_type = ""
+        if self.news_type is "everything":
+            if self.keyword is not None:
+                self.query_type = "q=" + self.keyword + "&"
+                if domains is not None:
+                    self.full_url = self.base_url + \
+                                    self.news_type + "?" + \
+                                    self.query_type + \
+                                    "domain=" + self.domains + "&" + \
+                                    self.api
+                else:
+                    self.full_url = self.base_url + \
+                                    self.news_type + "?" + \
+                                    self.query_type + \
+                                    "language=" + self.language + "&" + \
+                                    self.api
+        else:
+            # assuming self.news_type = "top-headlines"
+            self.full_url = self.base_url + \
+                            "top-headlines?" + \
+                            self.source + \
+                            "country=" + self.country + "&" + \
+                            self.api
+
+        self.__dict__.update(kwargs)
 
     def documentation(self):
         print('----- Refer -----')
@@ -97,16 +120,10 @@ class newsApi(object):
         json_resp = response.json()
         if json_resp["status"] == "ok":
             print('newsAPI query successful')
-            print(json_resp)
+            return json_resp
         else:
             print('newsAPI query NOT SUCCESSFUL')
 
     def print_user_text(self, value):
         print('You selected : ', value)
 
-
-
-def print_newsapi():
-    news = newsApi()
-    news.get_response()
-    return "Test hello from newsApi"
